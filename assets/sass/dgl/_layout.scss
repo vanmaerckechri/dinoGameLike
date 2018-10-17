@@ -1,0 +1,23 @@
+@import "variables";
+
+.dglTutoContainer
+{
+	width: 100vw;
+	height: 100vh;
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+	align-items: center;
+	background-color: $boardColor;
+	h1
+	{
+		margin-bottom: 10px;
+		font-family: 'fontFamTitles';
+		font-size: 2.5rem;
+		color: white;
+	}
+	.dglLaunchGameButton
+	{
+		position: static;
+	}
+}

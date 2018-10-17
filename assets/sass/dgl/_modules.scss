@@ -1,0 +1,48 @@
+@import "variables";
+// !!! Delete this part when collapse to main game(1TerreAction)
+// => ------------------------------------------------------
+.disabled
+{
+	display: none!important;
+	pointer-events: none!important;
+}
+.disabled_v2
+{
+	opacity: 0!important;
+	pointer-events: none;
+}
+.buttonDefault
+{
+	border: 1px solid white;
+	border-radius: 8px;
+	padding: 8px 10px;
+	position: absolute;
+	right: 4rem;
+	bottom: 2rem;
+	//font-family: 'Orbitron', sans-serif;
+	font-family: 'fontFamMain';
+	font-size: 1rem;
+	color: white;
+	font-weight: bold;
+	text-decoration: none;
+	background-color: $ac-blue;
+	transition: all .5s;
+	z-index: 2;
+	&:hover
+	{
+		border: 1px solid black;
+		cursor: pointer;
+		color: rgb(0, 60, 120);
+		background-color: rgb(255, 255, 255);
+	}
+}
+.leaveGameButtonContainer
+{
+	position: relative;
+	left: 50%;
+	bottom: 130px;
+	max-width: 1920px;
+	width: 100%;
+	transform: translateX(-50%);
+}
+// <= ------------------------------------------------------
