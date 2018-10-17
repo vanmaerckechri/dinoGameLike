@@ -1,5 +1,5 @@
 # DinoGameLike (en dév.)
 
-## Contexte
+## En Résumé
 
-Element du projet 1TerreAction réalisé pour [Enabel](https://www.enabel.be/fr/) / [Annoncer la Couleur](http://www.annoncerlacouleur.be/) (février 2018).
+Un élément du projet 1TerreAction réalisé pour [Enabel](https://www.enabel.be/fr/) / [Annoncer la Couleur](http://www.annoncerlacouleur.be/) (février 2018).
