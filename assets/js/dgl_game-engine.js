@@ -22,7 +22,7 @@ let DinoGameLike = class
 			img: createElem("img", "src", "assets/img/mountains.svg"),
 			posX: 0,
 			posY: 1,
-			speedZ: 2,
+			speedZ: 1,
 			width: 1280,
 			height: 640,
 			heightRatio: 75
@@ -32,11 +32,21 @@ let DinoGameLike = class
 			img: createElem("img", "src", "assets/img/clouds.svg"),
 			posX: 0,
 			posY: 0,
-			speedZ: 1,
+			speedZ: 0.5,
 			width: 1280,
 			height: 640,
 			heightRatio: 75
 		};
+		this.player = 
+		{
+			posX: 0,
+			posY: 0,
+			floorPosY: 0,
+			jump: 0,
+			jumpStep: 0,
+			jumpMaxPosY: 0,
+			radius: 20
+		}
 		this.parallax = [this.plxForest, this.plxMountains, this.plxClouds];
 /*
 		this.consumerProducts = 
@@ -116,6 +126,39 @@ let DinoGameLike = class
 		}
 	}
 
+	playerJump()
+	{
+		// player is at the highest (fall begins)
+		if (this.player.posY <= this.player.jumpMaxPosY)
+		{
+			this.player.jump = -1;
+		}
+		// player is at the lowest (jump is over)
+		if (this.player.posY > this.player.floorPosY)
+		{
+			this.player.jump = 0;
+			this.player.posY = this.player.floorPosY;
+		}
+		// player falling
+		if (this.player.jump === -1)
+		{
+			this.player.posY += this.player.jumpStep;
+		}
+		// player jump
+		if (this.player.jump === 1)
+		{
+			this.player.posY -= this.player.jumpStep;
+		}
+	}
+
+	drawPlayer()
+	{
+		this.playerJump();
+		this.canvasList[0].beginPath();
+		this.canvasList[0].arc(this.player.posX, this.player.posY, this.player.radius, 0, 2*Math.PI);
+		this.canvasList[0].fill();
+	}
+
 	refreshGame()
 	{
 		if (this.endOfGame == false)//endOfGame status change in treatAnswer()
@@ -130,6 +173,7 @@ let DinoGameLike = class
 			this.timeStart = this.countTime(this.frameBySecTimeStart, 1000);
 			this.calculFrameBySec();
 			this.drawParallax();
+			this.drawPlayer();
 			this.refreshGameLoop = window.requestAnimationFrame(this.refreshGame.bind(this));
 		}
 		else
@@ -138,8 +182,25 @@ let DinoGameLike = class
 		}
 	}
 
-	initCommands()
+	detectKey(that, event)
 	{
+		// "space"
+		if (event.keyCode === 32)
+		{
+			if (this.player.jump === 0)
+			{
+				this.player.jump = 1;
+			}
+		}
+	}
+
+	updateCanvasSizes()
+	{
+		for (let i = this.canvasList.length - 1; i >= 0; i--)
+		{
+			this.canvasList[i].canvas.width = window.innerWidth;
+			this.canvasList[i].canvas.height = window.innerHeight;
+		}
 	}
 
 	updateParallaxToCanvas()
@@ -159,13 +220,14 @@ let DinoGameLike = class
 		}
 	}
 
-	updateCanvasSizes()
+	updatePlayerToCanvas()
 	{
-		for (let i = this.canvasList.length - 1; i >= 0; i--)
-		{
-			this.canvasList[i].canvas.width = window.innerWidth;
-			this.canvasList[i].canvas.height = window.innerHeight;
-		}
+		this.player.radius = (this.canvasList[0].canvas.height / 100) * 2;
+		this.player.posX = (this.canvasList[0].canvas.width / 100) * 10;
+		this.player.floorPosY = this.canvasList[0].canvas.height - this.player.radius - ((this.canvasList[0].canvas.height / 100) * 10);
+		this.player.posY = this.canvasList[0].canvas.height - this.player.radius - ((this.canvasList[0].canvas.height / 100) * 10);
+		this.player.jumpStep = (this.canvasList[0].canvas.height / 100) * 1;
+		this.player.jumpMaxPosY = this.canvasList[0].canvas.height - (this.canvasList[0].canvas.height / 100) * 30;
 	}
 
 	initCanvas(canvas, canvasName)
@@ -189,11 +251,15 @@ let DinoGameLike = class
 	initEvents()
 	{
 		let that = this;
+		// resize
 		window.addEventListener("resize", function()
 		{
 			that.updateCanvasSizes();
 			that.updateParallaxToCanvas();
+			that.updatePlayerToCanvas();
 		}, false);
+		// commands
+		document.addEventListener("keydown", this.detectKey.bind(that, this), false);
 	}
 
 	launchGame()
@@ -209,7 +275,7 @@ let DinoGameLike = class
 
 		this.initCanvas(dglCanvasMain, "dglCtxMain");
 		this.updateParallaxToCanvas();
-		this.initCommands();
+		this.updatePlayerToCanvas();
 		this.initEvents();
 		window.requestAnimationFrame(this.refreshGame.bind(this)); 
 	}
