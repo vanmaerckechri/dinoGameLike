@@ -39,13 +39,18 @@ let DinoGameLike = class
 		};
 		this.player = 
 		{
+			img: [createElem("img", "src", "assets/img/bike01.svg"), createElem("img", "src", "assets/img/bike02.svg"), createElem("img", "src", "assets/img/bike03.svg"), createElem("img", "src", "assets/img/bike04.svg")],
+			currentImgIndex: 0,
+			imgEveryFrame: 0,
 			posX: 0,
 			posY: 0,
 			floorPosY: 0,
 			jump: 0,
+			jumpImg: createElem("img", "src", "assets/img/bikeJump.svg"),
 			jumpStep: 0,
 			jumpMaxPosY: 0,
-			radius: 20
+			width: 1280,
+			height: 720
 		}
 		this.parallax = [this.plxForest, this.plxMountains, this.plxClouds];
 /*
@@ -117,6 +122,7 @@ let DinoGameLike = class
 
 			this.canvasList[0].drawImage(plx[i].img, plx[i].posX, plx[i].posY, plx[i].width, plx[i].height);
 			
+			// repeat img to fill canvas
 			let numberOfInstance = Math.ceil(this.canvasList[0].canvas.width / (plx[i].width));
 			for (let j = 0; j < numberOfInstance; j++)
 			{
@@ -154,9 +160,27 @@ let DinoGameLike = class
 	drawPlayer()
 	{
 		this.playerJump();
-		this.canvasList[0].beginPath();
-		this.canvasList[0].arc(this.player.posX, this.player.posY, this.player.radius, 0, 2*Math.PI);
-		this.canvasList[0].fill();
+		// animation
+		this.player.imgEveryFrame += 1;
+		if (this.player.jump === 0)
+		{
+			if (this.player.imgEveryFrame % 5 === 0)
+			{
+				if (this.player.currentImgIndex < this.player.img.length - 1)
+				{
+					this.player.currentImgIndex += 1;
+				}
+				else
+				{
+					this.player.currentImgIndex = 0;
+				}
+			}
+			this.canvasList[0].drawImage(this.player.img[this.player.currentImgIndex], this.player.posX, this.player.posY, this.player.width, this.player.height);
+		}
+		else
+		{
+			this.canvasList[0].drawImage(this.player.jumpImg, this.player.posX, this.player.posY, this.player.width, this.player.height);
+		}
 	}
 
 	refreshGame()
@@ -222,12 +246,14 @@ let DinoGameLike = class
 
 	updatePlayerToCanvas()
 	{
-		this.player.radius = (this.canvasList[0].canvas.height / 100) * 2;
-		this.player.posX = (this.canvasList[0].canvas.width / 100) * 10;
-		this.player.floorPosY = this.canvasList[0].canvas.height - this.player.radius - ((this.canvasList[0].canvas.height / 100) * 10);
-		this.player.posY = this.canvasList[0].canvas.height - this.player.radius - ((this.canvasList[0].canvas.height / 100) * 10);
+		let ratio = this.player.width / this.player.height;
+		this.player.height = (this.canvasList[0].canvas.height / 100) * 10;
+		this.player.width = this.player.height * ratio;
+		this.player.posX = (this.canvasList[0].canvas.width / 100) * 1;
+		this.player.floorPosY = this.canvasList[0].canvas.height - this.player.height - (this.canvasList[0].canvas.height / 100) * 5;
+		this.player.posY = this.player.floorPosY;
 		this.player.jumpStep = (this.canvasList[0].canvas.height / 100) * 1;
-		this.player.jumpMaxPosY = this.canvasList[0].canvas.height - (this.canvasList[0].canvas.height / 100) * 30;
+		this.player.jumpMaxPosY = this.player.floorPosY - (this.canvasList[0].canvas.height / 100) * 20;
 	}
 
 	initCanvas(canvas, canvasName)
