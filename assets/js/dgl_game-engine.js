@@ -7,6 +7,16 @@ let DinoGameLike = class
 		this.canvasList = [];
 		this.timeStart;
 		this.speed = 1;
+		this.plxRoad = 
+		{
+			img: createElem("img", "src", "assets/img/road.svg"),
+			posX: 0,
+			posY: 1,
+			speedZ: 6,
+			width: 1280,
+			height: 200,
+			heightRatio: 20
+		};
 		this.plxForest = 
 		{
 			img: createElem("img", "src", "assets/img/forest.svg"),
@@ -17,9 +27,19 @@ let DinoGameLike = class
 			height: 200,
 			heightRatio: 33
 		};
-		this.plxMountains = 
+		this.plxMountainsA = 
 		{
-			img: createElem("img", "src", "assets/img/mountains.svg"),
+			img: createElem("img", "src", "assets/img/mountains_a.svg"),
+			posX: 0,
+			posY: 1,
+			speedZ: 1.5,
+			width: 1280,
+			height: 640,
+			heightRatio: 75
+		};
+		this.plxMountainsB = 
+		{
+			img: createElem("img", "src", "assets/img/mountains_b.svg"),
 			posX: 0,
 			posY: 1,
 			speedZ: 1,
@@ -37,6 +57,9 @@ let DinoGameLike = class
 			height: 640,
 			heightRatio: 75
 		};
+
+		this.parallax = [this.plxRoad, this.plxForest, this.plxMountainsA, this.plxMountainsB, this.plxClouds];
+
 		this.player = 
 		{
 			img: [createElem("img", "src", "assets/img/bike01.svg"), createElem("img", "src", "assets/img/bike02.svg"), createElem("img", "src", "assets/img/bike03.svg"), createElem("img", "src", "assets/img/bike04.svg")],
@@ -52,7 +75,6 @@ let DinoGameLike = class
 			width: 1280,
 			height: 720
 		}
-		this.parallax = [this.plxForest, this.plxMountains, this.plxClouds];
 /*
 		this.consumerProducts = 
 		[
