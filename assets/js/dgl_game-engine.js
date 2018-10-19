@@ -74,7 +74,20 @@ let DinoGameLike = class
 			jumpMaxPosY: 0,
 			width: 1280,
 			height: 720
-		}
+		};
+
+		this.obsCowimg = createElem("img", "src", "assets/img/cow.svg");
+		this.obsCow =
+		{
+			posX: 0,
+			posY: 0,
+			width: 640,
+			height: 480
+		};
+
+		this.obstacles = [this.obsCow];
+		this.currentObstacles = [];
+		this.obsCreateEveryFrame = 0;
 /*
 		this.consumerProducts = 
 		[
@@ -126,6 +139,46 @@ let DinoGameLike = class
 			this.frameBySec = 0;
 		}
 		this.frameBySec += 1;
+	}
+
+	updateObstacle(obs)
+	{
+		let ratio = obs.width / obs.height;
+		obs.height = (this.canvasList[0].canvas.height / 100) * 9;
+		obs.width = obs.height * ratio;
+		obs.posY = this.player.floorPosY + this.player.height - obs.height;
+	}
+
+	createObstacle()
+	{
+		if (this.obsCreateEveryFrame === 120)
+		{
+			let obstacle = Object.create(this.obsCow);
+			obstacle.posX = this.canvasList[0].canvas.width + obstacle.width;
+			this.updateObstacle(obstacle);
+			this.currentObstacles.push(obstacle);
+
+			this.obsCreateEveryFrame = 0;
+		}
+		else
+		{
+			this.obsCreateEveryFrame += 1;
+		}
+	}
+
+	drawObstacles()
+	{
+		this.createObstacle();
+		for (let i = this.currentObstacles.length - 1; i >= 0; i--)
+		{
+			this.currentObstacles[i].posX -= this.speed * this.plxRoad.speedZ;
+			this.canvasList[0].drawImage(this.obsCowimg, this.currentObstacles[i].posX, this.currentObstacles[i].posY, this.currentObstacles[i].width, this.currentObstacles[i].height);
+			// delete obstacle if it goes out of the screen by the left
+			if (this.currentObstacles[i].posX + this.currentObstacles[i].width < 0)
+			{
+				this.currentObstacles.splice(i, 1);
+			}
+		}
 	}
 
 	drawParallax()
@@ -219,6 +272,7 @@ let DinoGameLike = class
 			this.timeStart = this.countTime(this.frameBySecTimeStart, 1000);
 			this.calculFrameBySec();
 			this.drawParallax();
+			this.drawObstacles();
 			this.drawPlayer();
 			this.refreshGameLoop = window.requestAnimationFrame(this.refreshGame.bind(this));
 		}
@@ -274,8 +328,8 @@ let DinoGameLike = class
 		this.player.posX = (this.canvasList[0].canvas.width / 100) * 1;
 		this.player.floorPosY = this.canvasList[0].canvas.height - this.player.height - (this.canvasList[0].canvas.height / 100) * 5;
 		this.player.posY = this.player.floorPosY;
-		this.player.jumpStep = (this.canvasList[0].canvas.height / 100) * 1;
-		this.player.jumpMaxPosY = this.player.floorPosY - (this.canvasList[0].canvas.height / 100) * 20;
+		this.player.jumpStep = this.player.height / 100 * 10;
+		this.player.jumpMaxPosY = this.player.floorPosY - (this.player.height * 2.5);
 	}
 
 	initCanvas(canvas, canvasName)
@@ -305,6 +359,10 @@ let DinoGameLike = class
 			that.updateCanvasSizes();
 			that.updateParallaxToCanvas();
 			that.updatePlayerToCanvas();
+			for (let i = that.currentObstacles.length - 1; i >= 0; i--)
+			{
+				that.updateObstacle(that.currentObstacles[i]);
+			}
 		}, false);
 		// commands
 		document.addEventListener("keydown", this.detectKey.bind(that, this), false);
