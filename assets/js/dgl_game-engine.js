@@ -71,6 +71,7 @@ let DinoGameLike = class
 			jump: 0,
 			jumpImg: createElem("img", "src", "assets/img/bikeJump.svg"),
 			jumpStep: 0,
+			jumpInertieMaxPosY: 0,
 			jumpMaxPosY: 0,
 			width: 1280,
 			height: 720
@@ -209,8 +210,22 @@ let DinoGameLike = class
 
 	playerJump()
 	{
+		// jump intensity
+		if (this.player.jump === 2)
+		{
+			let jumpInertieMaxPosY = this.player.posY - (10 * this.player.jumpStep);
+			this.player.jump = 1;
+			if (jumpInertieMaxPosY > this.player.jumpMaxPosY)
+			{
+				this.player.jumpInertieMaxPosY = jumpInertieMaxPosY;
+			}
+			else
+			{
+				this.player.jumpInertieMaxPosY = this.player.jumpMaxPosY;
+			}
+		}
 		// player is at the highest (fall begins)
-		if (this.player.posY <= this.player.jumpMaxPosY)
+		if (this.player.posY <= this.player.jumpInertieMaxPosY)
 		{
 			this.player.jump = -1;
 		}
@@ -219,6 +234,7 @@ let DinoGameLike = class
 		{
 			this.player.jump = 0;
 			this.player.posY = this.player.floorPosY;
+			this.player.jumpInertieMaxPosY = this.player.jumpMaxPosY;
 		}
 		// player falling
 		if (this.player.jump === -1)
@@ -282,7 +298,7 @@ let DinoGameLike = class
 		}
 	}
 
-	detectKey(that, event)
+	detectKeyDown(that, event)
 	{
 		// "space"
 		if (event.keyCode === 32)
@@ -290,6 +306,18 @@ let DinoGameLike = class
 			if (this.player.jump === 0)
 			{
 				this.player.jump = 1;
+			}
+		}
+	}
+
+	detectKeyUp(that, event)
+	{
+		// "space"
+		if (event.keyCode === 32)
+		{
+			if (this.player.jump === 1)
+			{
+				this.player.jump = 2;
 			}
 		}
 	}
@@ -330,6 +358,7 @@ let DinoGameLike = class
 		this.player.posY = this.player.floorPosY;
 		this.player.jumpStep = this.player.height / 100 * 10;
 		this.player.jumpMaxPosY = this.player.floorPosY - (this.player.height * 2.5);
+		this.player.jumpInertieMaxPosY = this.player.jumpMaxPosY;
 	}
 
 	initCanvas(canvas, canvasName)
@@ -365,7 +394,8 @@ let DinoGameLike = class
 			}
 		}, false);
 		// commands
-		document.addEventListener("keydown", this.detectKey.bind(that, this), false);
+		document.addEventListener("keydown", this.detectKeyDown.bind(that, this), false);
+		document.addEventListener("keyup", this.detectKeyUp.bind(that, this), false);
 	}
 
 	launchGame()
