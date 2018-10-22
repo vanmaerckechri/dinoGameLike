@@ -83,8 +83,19 @@ let DinoGameLike = class
 			img: this.obsCowImg,
 			posX: 0,
 			posY: 0,
-			width: 640,
-			height: 480,
+			width: 64,
+			height: 48,
+			elemType: "floor"
+		};
+
+		this.obsCowV02Img = createElem("img", "src", "assets/img/cow_v02.svg");
+		this.obsCowV02 =
+		{
+			img: this.obsCowV02Img,
+			posX: 0,
+			posY: 0,
+			width: 78,
+			height: 74,
 			elemType: "floor"
 		};
 
@@ -94,12 +105,12 @@ let DinoGameLike = class
 			img: this.obsBalloonImg,
 			posX: 0,
 			posY: 0,
-			width: 320,
-			height: 320,
+			width: 42,
+			height: 64,
 			elemType: "fly"
 		};
 
-		this.obstacles = [this.obsCow, this.obsBalloon];
+		this.obstacles = [this.obsCow, this.obsCowV02, this.obsBalloon];
 		this.currentObstacles = [];
 		this.obsCreateEveryFrame = 0;
 
@@ -112,8 +123,8 @@ let DinoGameLike = class
 				co2: -10,
 				posX: 0,
 				posY: 0,
-				width: 75,
-				height: 75,
+				width: 33,
+				height: 33,
 				elemType: "floor"
 			},
 			this.bottle = 
@@ -123,8 +134,8 @@ let DinoGameLike = class
 				co2: 10,
 				posX: 0,
 				posY: 0,
-				width: 75,
-				height: 75,
+				width: 33,
+				height: 33,
 				elemType: "floor"
 			},
 			this.flask = 
@@ -134,8 +145,8 @@ let DinoGameLike = class
 				co2: -10,
 				posX: 0,
 				posY: 0,
-				width: 75,
-				height: 75,
+				width: 33,
+				height: 33,
 				elemType: "floor"
 			},
 			this.beef = 
@@ -145,8 +156,8 @@ let DinoGameLike = class
 				co2: 10,
 				posX: 0,
 				posY: 0,
-				width: 75,
-				height: 75,
+				width: 33,
+				height: 33,
 				elemType: "floor"
 			},
 			this.kiwi = 
@@ -156,8 +167,8 @@ let DinoGameLike = class
 				co2: 10,
 				posX: 0,
 				posY: 0,
-				width: 75,
-				height: 75,
+				width: 33,
+				height: 33,
 				elemType: "floor"
 			}
 		];
@@ -222,7 +233,7 @@ let DinoGameLike = class
 	updateInteractiveElements(elem)
 	{
 		let ratio = elem.width / elem.height;
-		elem.height = (this.canvasList[0].canvas.height / 100) * 9;
+		elem.height = (this.canvasList[0].canvas.height / 100) * (elem.height / 100) * 18;
 		elem.width = elem.height * ratio;
 		if (elem.elemType == "floor")
 		{
@@ -230,7 +241,7 @@ let DinoGameLike = class
 		}
 		else
 		{
-			elem.posY = this.player.floorPosY - (this.player.height * 1.5);
+			elem.posY = this.player.floorPosY - (this.player.height * 2);
 		}
 	}
 
@@ -349,8 +360,8 @@ let DinoGameLike = class
 		let pBottom = this.player.posY + this.player.height;
 
 		// dummy collisions (dummy surface = 10% obstacle image)
-		let dWidth = (elem.width / 100) * 10;
-		let dHeight = (elem.height / 100) * 10;
+		let dWidth = (elem.width / 100) * 2;
+		let dHeight = (elem.height / 100) * 2;
 		let dLeft = elem.posX + (elem.width / 2) - (dWidth / 2);
 		let dRight = dLeft + dWidth;
 		let dTop = elem.posY + (elem.height / 2) - (dHeight / 2);
@@ -372,9 +383,16 @@ let DinoGameLike = class
 			this.canvasList[0].drawImage(elem.img, elem.posX, elem.posY, elem.width, elem.height);
 			// collisions
 			let colTest = this.checkCollisions(elem, elementType);
-			if (elementType === "item" && colTest === true)
+			if (colTest === true)
 			{
-				this.updateCo2Metter(elem.co2);
+				if (elementType === "item")
+				{				
+					this.updateCo2Metter(elem.co2);
+				}
+				else
+				{
+					this.gameOver();
+				}
 			}
 			// delete obstacle if it goes out of the screen by the left || if item touch the player
 			if (elem.posX + elem.width < 0 || (elementType === "item" && colTest === true))
@@ -474,6 +492,14 @@ let DinoGameLike = class
 		{
 			this.canvasList[0].drawImage(this.player.jumpImg, this.player.posX, this.player.posY, this.player.width, this.player.height);
 		}
+	}
+
+	gameOver()
+	{
+		this.endOfGame = true;
+		let gameOver = createElem("p", "class", "dglGameover");
+		gameOver.innerHTML = "La partie est perdue...<br>Tu feras mieux une prochaine fois!";
+		document.getElementsByTagName("body")[0].appendChild(gameOver);
 	}
 
 	refreshGame()
@@ -649,7 +675,7 @@ let DinoGameLike = class
 		this.updatePlayerToCanvas();
 		this.initEvents();
 		this.loadNextItem();
-		window.requestAnimationFrame(this.refreshGame.bind(this)); 
+		this.refreshGame(); 
 	}
 
 	launchTuto()
