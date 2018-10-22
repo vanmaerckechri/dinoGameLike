@@ -32,7 +32,7 @@ let DinoGameLike = class
 			img: createElem("img", "src", "assets/img/mountains_a.svg"),
 			posX: 0,
 			posY: 1,
-			speedZ: 1.5,
+			speedZ: 3,
 			width: 1280,
 			height: 640,
 			heightRatio: 75
@@ -42,7 +42,7 @@ let DinoGameLike = class
 			img: createElem("img", "src", "assets/img/mountains_b.svg"),
 			posX: 0,
 			posY: 1,
-			speedZ: 1,
+			speedZ: 2,
 			width: 1280,
 			height: 640,
 			heightRatio: 75
@@ -52,7 +52,7 @@ let DinoGameLike = class
 			img: createElem("img", "src", "assets/img/clouds.svg"),
 			posX: 0,
 			posY: 0,
-			speedZ: 0.5,
+			speedZ: 1,
 			width: 1280,
 			height: 640,
 			heightRatio: 75
@@ -85,7 +85,7 @@ let DinoGameLike = class
 			posY: 0,
 			width: 640,
 			height: 480,
-			obsType: "floor"
+			elemType: "floor"
 		};
 
 		this.obsBalloonImg = createElem("img", "src", "assets/img/balloon.svg");
@@ -96,37 +96,83 @@ let DinoGameLike = class
 			posY: 0,
 			width: 320,
 			height: 320,
-			obsType: "fly"
+			elemType: "fly"
 		};
 
 		this.obstacles = [this.obsCow, this.obsBalloon];
 		this.currentObstacles = [];
 		this.obsCreateEveryFrame = 0;
-/*
-		this.consumerProducts = 
+
+		this.itemsList = 
 		[
-			this.packagedStrawberries = 
+			this.apple = 
 			{
-				id: 0,
-				img: createElem("img", "src", "assets/img/packStrawb.svg"),
-				alt: "fraises emballées",
-				co2: 1;
+				img: createElem("img", "src", "assets/img/apple.svg"),
+				alt: "pomme",
+				co2: -10,
+				posX: 0,
+				posY: 0,
+				width: 75,
+				height: 75,
+				elemType: "floor"
 			},
-			this.bulkStrawberries = 
+			this.bottle = 
 			{
-				id: 0,
-				img: createElem("img", "src", "assets/img/bulkStrawb.svg"),
-				alt: "fraises en vrac",
-				co2: -1;
+				img: createElem("img", "src", "assets/img/bottle.svg"),
+				alt: "bouteille d'eau",
+				co2: 10,
+				posX: 0,
+				posY: 0,
+				width: 75,
+				height: 75,
+				elemType: "floor"
+			},
+			this.flask = 
+			{
+				img: createElem("img", "src", "assets/img/flask.svg"),
+				alt: "gourde",
+				co2: -10,
+				posX: 0,
+				posY: 0,
+				width: 75,
+				height: 75,
+				elemType: "floor"
+			},
+			this.beef = 
+			{
+				img: createElem("img", "src", "assets/img/beef.svg"),
+				alt: "morceau de boeuf",
+				co2: 10,
+				posX: 0,
+				posY: 0,
+				width: 75,
+				height: 75,
+				elemType: "floor"
+			},
+			this.kiwi = 
+			{
+				img: createElem("img", "src", "assets/img/kiwi.svg"),
+				alt: "kiwi",
+				co2: 10,
+				posX: 0,
+				posY: 0,
+				width: 75,
+				height: 75,
+				elemType: "floor"
 			}
 		];
-*/
+		this.itemCreateEveryFrame = 0;
+		this.nextItem = "";
+		this.currentItems = [];
+
 
 		this.score = 0;
 		this.endOfGame = false;
 
 		this.frameBySec = 60;
 		this.frameBySecTimeStart;
+
+		this.UIInfos = [];
 	}
 
 	countTime(timeStart, milliSec)
@@ -149,30 +195,91 @@ let DinoGameLike = class
 		this.frameBySecTimeStart = this.countTime(this.frameBySecTimeStart, 1000);
 		if (frameBySecTimeStart != this.frameBySecTimeStart)
 		{
-			//console.log(this.frameBySec);
+			console.log(this.frameBySec);
 			this.frameBySec = 0;
 		}
 		this.frameBySec += 1;
 	}
 
-	updateObstacle(obs)
+	updateCo2Metter(points)
 	{
-		let ratio = obs.width / obs.height;
-		obs.height = (this.canvasList[0].canvas.height / 100) * 9;
-		obs.width = obs.height * ratio;
-		if (obs.obsType == "floor")
+		let dglCOMetter = document.getElementById("dglCOMetter");
+		let dglCOValue = document.getElementById("dglCOValue");
+		let newCOScore = parseInt(dglCOValue.innerText ,10) + points;
+		if (newCOScore >= 100)
 		{
-			obs.posY = this.player.floorPosY + this.player.height - obs.height;
+			newCOScore = 100;
+		}
+		else if (newCOScore <= 0)
+		{
+			newCOScore = 0;
+		}
+		dglCOValue.innerText = newCOScore;
+		newCOScore /= 100;
+		dglCOMetter.style.transform = "scaleX("+newCOScore+")";
+	}
+
+	updateInteractiveElements(elem)
+	{
+		let ratio = elem.width / elem.height;
+		elem.height = (this.canvasList[0].canvas.height / 100) * 9;
+		elem.width = elem.height * ratio;
+		if (elem.elemType == "floor")
+		{
+			elem.posY = this.player.floorPosY + this.player.height - elem.height;
 		}
 		else
 		{
-			obs.posY = this.player.floorPosY - (this.player.height * 1.5);
+			elem.posY = this.player.floorPosY - (this.player.height * 1.5);
+		}
+	}
+
+	loadNextItem()
+	{
+		let nextItemIndex = Math.floor((Math.random() * (this.itemsList.length - 1)) + 0);
+		this.nextItem = this.itemsList[nextItemIndex];
+		this.itemsList.splice(nextItemIndex, 1);
+
+		let dglNextItemContainer = document.getElementById("dglNextItemContainer")
+		dglNextItemContainer.appendChild(this.nextItem.img);
+		let dglNextItemImg = dglNextItemContainer.querySelector("img");
+		dglNextItemImg.setAttribute("id", "dglNextItemImg");
+		dglNextItemImg.setAttribute("class", "dglNextItemImg");
+		dglNextItemImg.setAttribute("alt", this.nextItem.alt);
+	}
+
+	createItem()
+	{
+		if (this.itemCreateEveryFrame >= 600)
+		{
+			this.obsCreateEveryFrame = 0;	
+			this.itemCreateEveryFrame = 0;	
+
+			let dglNextItemImg = document.getElementById("dglNextItemImg");
+			dglNextItemImg.remove();
+			this.nextItem.posX = this.canvasList[0].canvas.width;
+			let randPosY = Math.floor((Math.random() * 2) + 1);
+			if (randPosY === 1)
+			{
+				this.nextItem.elemType = "floor";
+			}
+			else
+			{
+				this.nextItem.elemType = "fly";
+			}
+			this.updateInteractiveElements(this.nextItem);
+			this.currentItems.push(this.nextItem);
+			this.loadNextItem();
+		}
+		else
+		{
+			this.itemCreateEveryFrame += 1;
 		}
 	}
 
 	createObstacle()
 	{
-		if (this.obsCreateEveryFrame === 60)
+		if (this.obsCreateEveryFrame >= 60)
 		{
 			// 2 chance out of 3 to create an obstacle
 			if  (Math.floor((Math.random() * 3) + 1) <= 2)
@@ -181,7 +288,7 @@ let DinoGameLike = class
 				let randIndex = Math.floor((Math.random() * (this.obstacles.length)) + 0);
 				let obstacle = Object.create(this.obstacles[randIndex]);
 				obstacle.posX = this.canvasList[0].canvas.width;
-				this.updateObstacle(obstacle);
+				this.updateInteractiveElements(obstacle);
 				this.currentObstacles.push(obstacle);
 			}
 			this.obsCreateEveryFrame = 0;				
@@ -192,7 +299,48 @@ let DinoGameLike = class
 		}
 	}
 
-	checkCollisionObstacle(obs)
+	deleteUiText()
+	{
+		let UIText = this.UIInfos;
+
+		for (let i = UIText.length - 1; i >= 0; i--)
+		{
+			UIText[i].birthDate += 1;
+			if (UIText[i].birthDate === 15)
+			{
+				UIText[i].tag.style.transform = "translateY(-2000%)";
+			}
+			else if (UIText[i].birthDate >= 120)
+			{
+				UIText[i].tag.remove();
+				UIText.splice(i, 1);
+			}
+		}
+	}
+
+	createUiText(elem, elemType)
+	{
+		if (elemType == "item")
+		{
+			let tag;
+			if (elem.co2 > 0)
+			{
+				tag = createElem("p", "class", "dglUiInfos dglSmsRed");
+				tag.innerText = "+10 de CO2";
+			}
+			else
+			{
+				tag = createElem("p", "class", "dglUiInfos dglSmsGreen");
+				tag.innerText = "-10 de CO2";				
+			}
+			tag.style.left = elem.posX + "px";
+			tag.style.top = elem.posY + "px";
+			document.getElementById("dglUIContainer").appendChild(tag);
+			this.UIInfos.push({tag: tag, birthDate: 0});
+		}
+	}
+
+	checkCollisions(elem, elementType)
 	{
 		let p = this.player;
 		let pLeft = this.player.posX;
@@ -200,38 +348,38 @@ let DinoGameLike = class
 		let pTop = this.player.posY;
 		let pBottom = this.player.posY + this.player.height;
 
-		/*let oLeft = obs.posX;
-		let oRight = obs.posX + obs.width;
-		let oTop = obs.posY;
-		let oBottom = obs.posY + obs.height;*/
-
 		// dummy collisions (dummy surface = 10% obstacle image)
-		let dWidth = (obs.width / 100) * 10;
-		let dHeight = (obs.height / 100) * 10;
-		let dLeft = obs.posX + (obs.width / 2) - (dWidth / 2);
+		let dWidth = (elem.width / 100) * 10;
+		let dHeight = (elem.height / 100) * 10;
+		let dLeft = elem.posX + (elem.width / 2) - (dWidth / 2);
 		let dRight = dLeft + dWidth;
-		let dTop = obs.posY + (obs.height / 2) - (dHeight / 2);
+		let dTop = elem.posY + (elem.height / 2) - (dHeight / 2);
 		let dBottom = dTop + dHeight;
 
 		if ((pLeft >= dLeft && pLeft < dRight && pTop >= dTop && pTop < dBottom) || (dLeft >= pLeft && dLeft < pRight && dTop >= pTop && dTop < pBottom) || (pRight >= dLeft && pRight < dRight && pBottom >= dTop && pBottom < dBottom) || (dRight >= pLeft && dRight < pRight && dBottom >= pTop && dBottom < pBottom))
 		{
-			console.log("touché")
+			this.createUiText(elem, elementType);
+			return true;
 		}
 	}
 
-	drawObstacles()
+	drawInteractiveElements(list, elementType)
 	{
-		this.createObstacle();
-		for (let i = this.currentObstacles.length - 1; i >= 0; i--)
+		for (let i = list.length - 1; i >= 0; i--)
 		{
-			let obs = this.currentObstacles[i];
-			obs.posX -= this.speed * this.plxRoad.speedZ;
-			this.canvasList[0].drawImage(obs.img, obs.posX, obs.posY, obs.width, obs.height);
-			this.checkCollisionObstacle(obs);
-			// delete obstacle if it goes out of the screen by the left
-			if (obs.posX + obs.width < 0)
+			let elem = list[i];
+			elem.posX -= this.speed * this.plxRoad.speedZ;
+			this.canvasList[0].drawImage(elem.img, elem.posX, elem.posY, elem.width, elem.height);
+			// collisions
+			let colTest = this.checkCollisions(elem, elementType);
+			if (elementType === "item" && colTest === true)
 			{
-				this.currentObstacles.splice(i, 1);
+				this.updateCo2Metter(elem.co2);
+			}
+			// delete obstacle if it goes out of the screen by the left || if item touch the player
+			if (elem.posX + elem.width < 0 || (elementType === "item" && colTest === true))
+			{
+				list.splice(i, 1);
 			}
 		}
 	}
@@ -341,9 +489,13 @@ let DinoGameLike = class
 			// game cycle
 			this.timeStart = this.countTime(this.frameBySecTimeStart, 1000);
 			this.calculFrameBySec();
+			this.createObstacle();
+			this.createItem();
 			this.drawParallax();
-			this.drawObstacles();
+			this.drawInteractiveElements(this.currentObstacles, "obstacle");
+			this.drawInteractiveElements(this.currentItems, "item");
 			this.drawPlayer();
+			this.deleteUiText();
 			this.refreshGameLoop = window.requestAnimationFrame(this.refreshGame.bind(this));
 		}
 		else
@@ -355,8 +507,9 @@ let DinoGameLike = class
 	detectKeyDown(that, event)
 	{
 		// "space"
-		if (event.keyCode === 32)
+		if (event.keyCode === 32 || event.type == "mousedown" || event.type == "touchstart")
 		{
+			event.preventDefault();
 			if (this.player.jump === 0)
 			{
 				this.player.jump = 1;
@@ -367,8 +520,9 @@ let DinoGameLike = class
 	detectKeyUp(that, event)
 	{
 		// "space"
-		if (event.keyCode === 32)
+		if (event.keyCode === 32 || event.type == "mouseup" || event.type == "touchend")
 		{
+			event.preventDefault();
 			if (this.player.jump === 1)
 			{
 				this.player.jump = 2;
@@ -444,12 +598,39 @@ let DinoGameLike = class
 			that.updatePlayerToCanvas();
 			for (let i = that.currentObstacles.length - 1; i >= 0; i--)
 			{
-				that.updateObstacle(that.currentObstacles[i]);
+				that.updateInteractiveElements(that.currentObstacles[i]);
+			}
+			for (let i = that.currentItems.length - 1; i >= 0; i--)
+			{
+				that.updateInteractiveElements(that.currentItems[i]);
 			}
 		}, false);
 		// commands
 		document.addEventListener("keydown", this.detectKeyDown.bind(that, this), false);
 		document.addEventListener("keyup", this.detectKeyUp.bind(that, this), false);
+
+		document.addEventListener("mousedown", this.detectKeyDown.bind(that, this), false);
+		document.addEventListener("mouseup", this.detectKeyUp.bind(that, this), false);
+	}
+
+	loadUI()
+	{
+		let dglContainer = document.getElementById("dglContainer");
+
+		let uiContainer = createElem("div", ["id", "class"], ["dglUIContainer", "dglUIContainer"]);
+		// CO2 metter
+		let coMetterContainer = createElem("id", ["class"], ["dglCOMetterContainer"]);
+		let coMetter = createElem("div", ["id","class"], ["dglCOMetter", "dglCOMetter"]);
+		let coValue = createElem("p", ["id", "class"], ["dglCOValue", "dglCOValue"]);
+		coValue.innerText = 50;
+		coMetter.appendChild(coValue);
+		coMetterContainer.appendChild(coMetter);
+		uiContainer.appendChild(coMetterContainer);
+		// Next item
+		let nextItemContainer = createElem("div", ["id", "class"], ["dglNextItemContainer", "dglNextItemContainer"]);
+		uiContainer.appendChild(nextItemContainer);
+
+		dglContainer.appendChild(uiContainer);
 	}
 
 	launchGame()
@@ -467,6 +648,7 @@ let DinoGameLike = class
 		this.updateParallaxToCanvas();
 		this.updatePlayerToCanvas();
 		this.initEvents();
+		this.loadNextItem();
 		window.requestAnimationFrame(this.refreshGame.bind(this)); 
 	}
 
@@ -485,7 +667,8 @@ let DinoGameLike = class
 					dglContainer.innerHTML = req.responseText;
 					document.getElementById("dglLaunchGameButton").onclick = function()
 					{
-						document.getElementById("dglTutoContainer").classList.add("disabled");
+						document.getElementById("dglTutoContainer").remove();
+						that.loadUI();
 						that.launchGame();
 					}
 				}
