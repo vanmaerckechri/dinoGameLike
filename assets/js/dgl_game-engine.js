@@ -77,16 +77,29 @@ let DinoGameLike = class
 			height: 720
 		};
 
-		this.obsCowimg = createElem("img", "src", "assets/img/cow.svg");
+		this.obsCowImg = createElem("img", "src", "assets/img/cow.svg");
 		this.obsCow =
 		{
+			img: this.obsCowImg,
 			posX: 0,
 			posY: 0,
 			width: 640,
-			height: 480
+			height: 480,
+			obsType: "floor"
 		};
 
-		this.obstacles = [this.obsCow];
+		this.obsBalloonImg = createElem("img", "src", "assets/img/balloon.svg");
+		this.obsBalloon =
+		{
+			img: this.obsBalloonImg,
+			posX: 0,
+			posY: 0,
+			width: 320,
+			height: 320,
+			obsType: "fly"
+		};
+
+		this.obstacles = [this.obsCow, this.obsBalloon];
 		this.currentObstacles = [];
 		this.obsCreateEveryFrame = 0;
 /*
@@ -136,7 +149,7 @@ let DinoGameLike = class
 		this.frameBySecTimeStart = this.countTime(this.frameBySecTimeStart, 1000);
 		if (frameBySecTimeStart != this.frameBySecTimeStart)
 		{
-			console.log(this.frameBySec);
+			//console.log(this.frameBySec);
 			this.frameBySec = 0;
 		}
 		this.frameBySec += 1;
@@ -147,23 +160,62 @@ let DinoGameLike = class
 		let ratio = obs.width / obs.height;
 		obs.height = (this.canvasList[0].canvas.height / 100) * 9;
 		obs.width = obs.height * ratio;
-		obs.posY = this.player.floorPosY + this.player.height - obs.height;
+		if (obs.obsType == "floor")
+		{
+			obs.posY = this.player.floorPosY + this.player.height - obs.height;
+		}
+		else
+		{
+			obs.posY = this.player.floorPosY - (this.player.height * 1.5);
+		}
 	}
 
 	createObstacle()
 	{
-		if (this.obsCreateEveryFrame === 120)
+		if (this.obsCreateEveryFrame === 60)
 		{
-			let obstacle = Object.create(this.obsCow);
-			obstacle.posX = this.canvasList[0].canvas.width + obstacle.width;
-			this.updateObstacle(obstacle);
-			this.currentObstacles.push(obstacle);
-
-			this.obsCreateEveryFrame = 0;
+			// 2 chance out of 3 to create an obstacle
+			if  (Math.floor((Math.random() * 3) + 1) <= 2)
+			{
+				// rand obstacle type
+				let randIndex = Math.floor((Math.random() * (this.obstacles.length)) + 0);
+				let obstacle = Object.create(this.obstacles[randIndex]);
+				obstacle.posX = this.canvasList[0].canvas.width;
+				this.updateObstacle(obstacle);
+				this.currentObstacles.push(obstacle);
+			}
+			this.obsCreateEveryFrame = 0;				
 		}
 		else
 		{
 			this.obsCreateEveryFrame += 1;
+		}
+	}
+
+	checkCollisionObstacle(obs)
+	{
+		let p = this.player;
+		let pLeft = this.player.posX;
+		let pRight = this.player.posX + this.player.width;
+		let pTop = this.player.posY;
+		let pBottom = this.player.posY + this.player.height;
+
+		/*let oLeft = obs.posX;
+		let oRight = obs.posX + obs.width;
+		let oTop = obs.posY;
+		let oBottom = obs.posY + obs.height;*/
+
+		// dummy collisions (dummy surface = 10% obstacle image)
+		let dWidth = (obs.width / 100) * 10;
+		let dHeight = (obs.height / 100) * 10;
+		let dLeft = obs.posX + (obs.width / 2) - (dWidth / 2);
+		let dRight = dLeft + dWidth;
+		let dTop = obs.posY + (obs.height / 2) - (dHeight / 2);
+		let dBottom = dTop + dHeight;
+
+		if ((pLeft >= dLeft && pLeft < dRight && pTop >= dTop && pTop < dBottom) || (dLeft >= pLeft && dLeft < pRight && dTop >= pTop && dTop < pBottom) || (pRight >= dLeft && pRight < dRight && pBottom >= dTop && pBottom < dBottom) || (dRight >= pLeft && dRight < pRight && dBottom >= pTop && dBottom < pBottom))
+		{
+			console.log("touché")
 		}
 	}
 
@@ -172,10 +224,12 @@ let DinoGameLike = class
 		this.createObstacle();
 		for (let i = this.currentObstacles.length - 1; i >= 0; i--)
 		{
-			this.currentObstacles[i].posX -= this.speed * this.plxRoad.speedZ;
-			this.canvasList[0].drawImage(this.obsCowimg, this.currentObstacles[i].posX, this.currentObstacles[i].posY, this.currentObstacles[i].width, this.currentObstacles[i].height);
+			let obs = this.currentObstacles[i];
+			obs.posX -= this.speed * this.plxRoad.speedZ;
+			this.canvasList[0].drawImage(obs.img, obs.posX, obs.posY, obs.width, obs.height);
+			this.checkCollisionObstacle(obs);
 			// delete obstacle if it goes out of the screen by the left
-			if (this.currentObstacles[i].posX + this.currentObstacles[i].width < 0)
+			if (obs.posX + obs.width < 0)
 			{
 				this.currentObstacles.splice(i, 1);
 			}
