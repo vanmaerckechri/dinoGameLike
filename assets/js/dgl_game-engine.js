@@ -169,7 +169,7 @@ let DinoGameLike = class
 			},
 			this.pear = 
 			{
-				img: createElem("img", "src", "assets/img/pear.svg"),
+				img: createElem("img", "src", "assets/img/pears.svg"),
 				alt: "poire en vrac",
 				co2: -10,
 				posX: 0,
@@ -212,6 +212,7 @@ let DinoGameLike = class
 				posY: 0,
 				width: 33,
 				height: 33,
+				heightOrigin: 33,
 				elemType: "floor"
 			},
 			this.beef = 
@@ -223,6 +224,7 @@ let DinoGameLike = class
 				posY: 0,
 				width: 33,
 				height: 33,
+				heightOrigin: 33,
 				elemType: "floor"
 			},
 			this.kiwi = 
@@ -234,6 +236,7 @@ let DinoGameLike = class
 				posY: 0,
 				width: 33,
 				height: 33,
+				heightOrigin: 33,
 				elemType: "floor"
 			}
 		];
