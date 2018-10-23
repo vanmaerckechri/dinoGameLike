@@ -85,8 +85,8 @@ let DinoGameLike = class
 			jumpStep: 0,
 			jumpInertieMaxPosY: 0,
 			jumpMaxPosY: 0,
-			width: 1280,
-			height: 720
+			width: 720,
+			height: 800
 		};
 
 		this.obsCowImg = createElem("img", "src", "assets/img/cow.svg");
@@ -588,9 +588,12 @@ let DinoGameLike = class
 	detectKeyDown(that, event)
 	{
 		// "space"
-		if (event.keyCode === 32 || event.type == "mousedown" || event.type == "touchstart")
+		if (event.keyCode === 32 || event.type == "touchstart" || event.type == "mousedown")
 		{
-			event.preventDefault();
+			if (event.type != "touchstart")
+			{
+				event.preventDefault();
+			}
 			if (this.player.jump === 0)
 			{
 				this.player.jump = 1;
@@ -601,9 +604,13 @@ let DinoGameLike = class
 	detectKeyUp(that, event)
 	{
 		// "space"
-		if (event.keyCode === 32 || event.type == "mouseup" || event.type == "touchend")
+		if (event.keyCode === 32 || event.type == "touchend" || event.type == "mouseup")
 		{
-			event.preventDefault();
+			console.log(event.type)
+			if (event.type != "touchend")
+			{
+				event.preventDefault();
+			}
 			if (this.player.jump === 1)
 			{
 				this.player.jump = 2;
@@ -691,8 +698,8 @@ let DinoGameLike = class
 		document.addEventListener("keydown", this.detectKeyDown.bind(that, this), false);
 		document.addEventListener("keyup", this.detectKeyUp.bind(that, this), false);
 
-		document.addEventListener("mousedown", this.detectKeyDown.bind(that, this), false);
-		document.addEventListener("mouseup", this.detectKeyUp.bind(that, this), false);
+		document.addEventListener("touchstart", this.detectKeyDown.bind(that, this), false) || document.addEventListener("mousedown", this.detectKeyDown.bind(that, this), false);
+		document.addEventListener("touchend", this.detectKeyUp.bind(that, this), false) || document.addEventListener("mouseup", this.detectKeyUp.bind(that, this), false);
 	}
 
 	loadUI()
