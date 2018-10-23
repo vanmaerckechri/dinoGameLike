@@ -155,7 +155,55 @@ let DinoGameLike = class
 				heightOrigin: 33,
 				elemType: "floor"
 			},
-			/*this.flask = 
+			this.mushroom = 
+			{
+				img: createElem("img", "src", "assets/img/mushroom.svg"),
+				alt: "champignons en vrac",
+				co2: -10,
+				posX: 0,
+				posY: 0,
+				width: 33,
+				height: 33,
+				heightOrigin: 33,
+				elemType: "floor"
+			},
+			this.pear = 
+			{
+				img: createElem("img", "src", "assets/img/pear.svg"),
+				alt: "poire en vrac",
+				co2: -10,
+				posX: 0,
+				posY: 0,
+				width: 33,
+				height: 33,
+				heightOrigin: 33,
+				elemType: "floor"
+			},
+			this.avocado = 
+			{
+				img: createElem("img", "src", "assets/img/avocado.svg"),
+				alt: "avocat",
+				co2: 10,
+				posX: 0,
+				posY: 0,
+				width: 33,
+				height: 33,
+				heightOrigin: 33,
+				elemType: "floor"
+			},
+			this.olives = 
+			{
+				img: createElem("img", "src", "assets/img/olives.svg"),
+				alt: "olives en vrac",
+				co2: 10,
+				posX: 0,
+				posY: 0,
+				width: 33,
+				height: 33,
+				heightOrigin: 33,
+				elemType: "floor"
+			},
+			this.flask = 
 			{
 				img: createElem("img", "src", "assets/img/flask.svg"),
 				alt: "gourde",
@@ -170,7 +218,7 @@ let DinoGameLike = class
 			{
 				img: createElem("img", "src", "assets/img/beef.svg"),
 				alt: "morceau de boeuf",
-				co2: 10,
+				co2: 20,
 				posX: 0,
 				posY: 0,
 				width: 33,
@@ -187,7 +235,7 @@ let DinoGameLike = class
 				width: 33,
 				height: 33,
 				elemType: "floor"
-			}*/
+			}
 		];
 		this.itemCreateEveryFrame = 0;
 		this.nextItem = "";
@@ -542,9 +590,16 @@ let DinoGameLike = class
 	win()
 	{
 		this.endOfGame = true;
-		let points = 100 - parseInt(document.getElementById("dglCOValue").innerText, 10);
+		let points = parseInt(document.getElementById("dglCOValue").innerText, 10);
 		let winContainer = createElem("p", "class", "dglGameover");
-		winContainer.innerHTML = "Félicitations, tu as terminé la partie avec "+points+" points!";
+		if (points < 50)
+		{
+			winContainer.innerHTML = "Félicitations, tu as terminé la partie avec un score de CO2 inférieur à 50% => "+points+"%.";
+		}
+		else
+		{
+			winContainer.innerHTML = "Tu as terminé la partie avec un score de CO2 supérieur ou égal à 50% => "+points+"%. Tu feras mieux la prochaine fois!";
+		}
 		document.getElementsByTagName("body")[0].appendChild(winContainer);
 	}
 
@@ -567,10 +622,10 @@ let DinoGameLike = class
 			}
 
 			// game cycle
-			this.timeStart = this.countTime(this.frameBySecTimeStart, 1000);
-			this.calculFrameBySec();
-			this.createObstacle();
+			//this.timeStart = this.countTime(this.frameBySecTimeStart, 1000);
+			//this.calculFrameBySec();
 			this.createItem();
+			this.createObstacle();
 			this.drawParallax();
 			this.drawGoal();
 			this.drawInteractiveElements(this.currentObstacles, "obstacle");
@@ -606,7 +661,6 @@ let DinoGameLike = class
 		// "space"
 		if (event.keyCode === 32 || event.type == "touchend" || event.type == "mouseup")
 		{
-			console.log(event.type)
 			if (event.type != "touchend")
 			{
 				event.preventDefault();
