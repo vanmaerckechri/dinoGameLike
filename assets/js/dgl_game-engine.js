@@ -7,6 +7,19 @@ let DinoGameLike = class
 		this.canvasList = [];
 		this.timeStart;
 		this.speed = 1;
+
+		this.plxGoal =
+		{
+			img: createElem("img", "src", "assets/img/goal.svg"),
+			posX: 0,
+			posY: 1,
+			speedZ: 6,
+			width: 40,
+			height: 200,
+			heightRatio: 20,
+			active: false		
+		}
+
 		this.plxRoad = 
 		{
 			img: createElem("img", "src", "assets/img/road.svg"),
@@ -57,7 +70,6 @@ let DinoGameLike = class
 			height: 640,
 			heightRatio: 75
 		};
-
 		this.parallax = [this.plxRoad, this.plxForest, this.plxMountainsA, this.plxMountainsB, this.plxClouds];
 
 		this.player = 
@@ -85,6 +97,7 @@ let DinoGameLike = class
 			posY: 0,
 			width: 64,
 			height: 48,
+			heightOrigin: 48,
 			elemType: "floor"
 		};
 
@@ -96,6 +109,7 @@ let DinoGameLike = class
 			posY: 0,
 			width: 78,
 			height: 74,
+			heightOrigin: 74,
 			elemType: "floor"
 		};
 
@@ -107,6 +121,7 @@ let DinoGameLike = class
 			posY: 0,
 			width: 42,
 			height: 64,
+			heightOrigin: 64,
 			elemType: "fly"
 		};
 
@@ -125,6 +140,7 @@ let DinoGameLike = class
 				posY: 0,
 				width: 33,
 				height: 33,
+				heightOrigin: 33,
 				elemType: "floor"
 			},
 			this.bottle = 
@@ -136,9 +152,10 @@ let DinoGameLike = class
 				posY: 0,
 				width: 33,
 				height: 33,
+				heightOrigin: 33,
 				elemType: "floor"
 			},
-			this.flask = 
+			/*this.flask = 
 			{
 				img: createElem("img", "src", "assets/img/flask.svg"),
 				alt: "gourde",
@@ -170,7 +187,7 @@ let DinoGameLike = class
 				width: 33,
 				height: 33,
 				elemType: "floor"
-			}
+			}*/
 		];
 		this.itemCreateEveryFrame = 0;
 		this.nextItem = "";
@@ -233,7 +250,7 @@ let DinoGameLike = class
 	updateInteractiveElements(elem)
 	{
 		let ratio = elem.width / elem.height;
-		elem.height = (this.canvasList[0].canvas.height / 100) * (elem.height / 100) * 18;
+		elem.height = (this.canvasList[0].canvas.height / 100) * (elem.heightOrigin / 100) * 18;
 		elem.width = elem.height * ratio;
 		if (elem.elemType == "floor")
 		{
@@ -247,7 +264,7 @@ let DinoGameLike = class
 
 	loadNextItem()
 	{
-		let nextItemIndex = Math.floor((Math.random() * (this.itemsList.length - 1)) + 0);
+		let nextItemIndex = Math.floor((Math.random() * (this.itemsList.length)) + 0);
 		this.nextItem = this.itemsList[nextItemIndex];
 		this.itemsList.splice(nextItemIndex, 1);
 
@@ -265,22 +282,36 @@ let DinoGameLike = class
 		{
 			this.obsCreateEveryFrame = 0;	
 			this.itemCreateEveryFrame = 0;	
-
-			let dglNextItemImg = document.getElementById("dglNextItemImg");
-			dglNextItemImg.remove();
-			this.nextItem.posX = this.canvasList[0].canvas.width;
-			let randPosY = Math.floor((Math.random() * 2) + 1);
-			if (randPosY === 1)
+			if (this.plxGoal.active == false)
 			{
-				this.nextItem.elemType = "floor";
+				let dglNextItemImg = document.getElementById("dglNextItemImg");
+				dglNextItemImg.remove();
+				this.nextItem.posX = this.canvasList[0].canvas.width;
+				let randPosY = Math.floor((Math.random() * 2) + 1);
+				if (randPosY === 1)
+				{
+					this.nextItem.elemType = "floor";
+				}
+				else
+				{
+					this.nextItem.elemType = "fly";
+				}
+				this.updateInteractiveElements(this.nextItem);
+				this.currentItems.push(this.nextItem);
+				if (this.itemsList.length > 0)
+				{
+					this.loadNextItem();
+				}
+				else
+				{
+					this.plxGoal.active = "waitNextCycle";
+				}
 			}
 			else
 			{
-				this.nextItem.elemType = "fly";
+				this.plxGoal.active = true;
+				this.plxGoal.posX = this.canvasList[0].canvas.width;
 			}
-			this.updateInteractiveElements(this.nextItem);
-			this.currentItems.push(this.nextItem);
-			this.loadNextItem();
 		}
 		else
 		{
@@ -385,7 +416,7 @@ let DinoGameLike = class
 			let colTest = this.checkCollisions(elem, elementType);
 			if (colTest === true)
 			{
-				if (elementType === "item")
+				if (elementType == "item")
 				{				
 					this.updateCo2Metter(elem.co2);
 				}
@@ -398,6 +429,20 @@ let DinoGameLike = class
 			if (elem.posX + elem.width < 0 || (elementType === "item" && colTest === true))
 			{
 				list.splice(i, 1);
+			}
+		}
+	}
+
+	drawGoal()
+	{
+		if (this.plxGoal.active === true)
+		{
+			this.canvasList[0].drawImage(this.plxGoal.img, this.plxGoal.posX + this.plxGoal.width, this.plxGoal.posY, this.plxGoal.width, this.plxGoal.height);
+			this.plxGoal.posX -= this.speed * this.plxGoal.speedZ;
+
+			if (this.player.posX >= this.plxGoal.posX)
+			{
+				this.win();
 			}
 		}
 	}
@@ -494,6 +539,15 @@ let DinoGameLike = class
 		}
 	}
 
+	win()
+	{
+		this.endOfGame = true;
+		let points = 100 - parseInt(document.getElementById("dglCOValue").innerText, 10);
+		let winContainer = createElem("p", "class", "dglGameover");
+		winContainer.innerHTML = "Félicitations, tu as terminé la partie avec "+points+" points!";
+		document.getElementsByTagName("body")[0].appendChild(winContainer);
+	}
+
 	gameOver()
 	{
 		this.endOfGame = true;
@@ -518,6 +572,7 @@ let DinoGameLike = class
 			this.createObstacle();
 			this.createItem();
 			this.drawParallax();
+			this.drawGoal();
 			this.drawInteractiveElements(this.currentObstacles, "obstacle");
 			this.drawInteractiveElements(this.currentItems, "item");
 			this.drawPlayer();
@@ -565,11 +620,11 @@ let DinoGameLike = class
 		}
 	}
 
-	updateParallaxToCanvas()
+	updateParallaxToCanvas(elem)
 	{
-		for (let i = this.parallax.length - 1; i >= 0; i--)
+		for (let i = elem.length - 1; i >= 0; i--)
 		{
-			let plx = this.parallax[i];
+			let plx = elem[i];
 			// update ratio
 			let ratio = plx.width / plx.height;
 			plx.height = (this.canvasList[0].canvas.height / 100) * plx.heightRatio;
@@ -620,7 +675,8 @@ let DinoGameLike = class
 		window.addEventListener("resize", function()
 		{
 			that.updateCanvasSizes();
-			that.updateParallaxToCanvas();
+			that.updateParallaxToCanvas(that.parallax);
+			that.updateParallaxToCanvas([that.plxGoal]);
 			that.updatePlayerToCanvas();
 			for (let i = that.currentObstacles.length - 1; i >= 0; i--)
 			{
@@ -671,7 +727,8 @@ let DinoGameLike = class
 		dglContainer.appendChild(dglCanvasContainer);
 
 		this.initCanvas(dglCanvasMain, "dglCtxMain");
-		this.updateParallaxToCanvas();
+		this.updateParallaxToCanvas(this.parallax);
+		this.updateParallaxToCanvas([this.plxGoal]);
 		this.updatePlayerToCanvas();
 		this.initEvents();
 		this.loadNextItem();
@@ -691,6 +748,7 @@ let DinoGameLike = class
 		        if (this.status === 200)
 		        {
 					dglContainer.innerHTML = req.responseText;
+
 					document.getElementById("dglLaunchGameButton").onclick = function()
 					{
 						document.getElementById("dglTutoContainer").remove();

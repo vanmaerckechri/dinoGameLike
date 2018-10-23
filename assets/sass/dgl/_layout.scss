@@ -10,22 +10,34 @@
 .dglTutoContainer
 {
 	width: 100vw;
-	height: 100vh;
+	min-height: 100vh;
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
 	align-items: center;
 	background-color: $boardColor;
-	h1
+	h2, h3
 	{
-		margin-bottom: 10px;
 		font-family: 'fontFamTitles';
-		font-size: 2.5rem;
-		color: white;
+		text-align: center;
 	}
 	.dglLaunchGameButton
 	{
 		position: static;
+	}
+	p
+	{
+		font-family: 'fontFamMain';
+	}
+	.dglTutoBikeImg
+	{
+		position: absolute;
+		left: 85px;
+		top: 27px;
+		width: 100px;
+		height: 100px;
+		background: center/contain no-repeat url("../img/bike01.svg");
+		animation: animateBike .3s infinite linear;
 	}
 }
 .dglUIContainer

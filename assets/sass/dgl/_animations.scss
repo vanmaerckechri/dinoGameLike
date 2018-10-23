@@ -1,12 +1,21 @@
 @import "variables";
-/*
-@keyframes animationName
+
+@keyframes animateBike
 {
     0%
     {
+		background: center/contain no-repeat url("../img/bike01.svg");
+	}
+    33%
+    {
+		background: center/contain no-repeat url("../img/bike02.svg");
+    }
+    66%
+    {
+		background: center/contain no-repeat url("../img/bike03.svg");
     }
     100%
     {
+		background: center/contain no-repeat url("../img/bike04.svg");
     }
 }
-*/

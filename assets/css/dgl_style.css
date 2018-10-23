@@ -28,17 +28,15 @@ button {
 @font-face {
   font-family: 'fontFamMain';
   src: url(../temp/minionpro_regular.otf); }
-/*
-@keyframes animationName
-{
-    0%
-    {
-    }
-    100%
-    {
-    }
-}
-*/
+@keyframes animateBike {
+  0% {
+    background: center/contain no-repeat url("../img/bike01.svg"); }
+  33% {
+    background: center/contain no-repeat url("../img/bike02.svg"); }
+  66% {
+    background: center/contain no-repeat url("../img/bike03.svg"); }
+  100% {
+    background: center/contain no-repeat url("../img/bike04.svg"); } }
 @font-face {
   font-family: 'fontFamTitles';
   src: url(../temp/brauerneue.otf); }
@@ -57,6 +55,87 @@ body {
 
 #main {
   max-width: 100vw; }
+
+.flsTutoContainer {
+  margin: 0 auto;
+  padding: 20px 60px;
+  border-radius: 24px;
+  position: relative;
+  max-width: 768px;
+  font-family: font-main;
+  color: black;
+  background-color: rgba(255, 255, 255, 0.9); }
+  .flsTutoContainer h2, .flsTutoContainer h3 {
+    margin: 30px 0;
+    position: relative;
+    z-index: 2;
+    font-family: font-title;
+    font-weight: bold;
+    letter-spacing: normal; }
+  .flsTutoContainer h2 {
+    font-size: 1.4rem; }
+  .flsTutoContainer h3 {
+    font-size: 1.3rem; }
+  .flsTutoContainer .flsTutoContent p {
+    margin-bottom: 20px;
+    position: relative;
+    padding: 0 30px;
+    text-align: left;
+    letter-spacing: normal;
+    line-height: 1.3rem;
+    z-index: 2; }
+  .flsTutoContainer .flsTutoContent .flsTutoControls {
+    padding-top: 10px;
+    padding-bottom: 10px;
+    border: 1px solid black;
+    border-radius: 24px;
+    background-color: white; }
+  .flsTutoContainer .flsTutoContent .flsTutoImgArrow {
+    margin: 0 4px 0 6px;
+    width: 32px;
+    height: auto;
+    vertical-align: middle; }
+  .flsTutoContainer .flsTutoContent .flsTutoPoints {
+    position: relative;
+    display: flex; }
+  .flsTutoContainer .flsTutoFruitLegShadow {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    left: 0;
+    top: 0;
+    opacity: .9; }
+    .flsTutoContainer .flsTutoFruitLegShadow::after {
+      border-radius: 50%;
+      position: absolute;
+      content: "";
+      left: 50%;
+      bottom: 0;
+      width: 64px;
+      height: 64px;
+      background-color: black;
+      opacity: .5;
+      color: red;
+      z-index: 1;
+      transform-origin: bottom;
+      transform: translate(-50%, -5%) scale(0.8, 0.2);
+      animation: jumpTomateShadow 1s linear infinite; }
+  .flsTutoContainer .flsTutoFruitLeg {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    transform-origin: bottom;
+    animation: jumpTomate 1s linear infinite;
+    z-index: 2; }
+  .flsTutoContainer .flsTutoTomate {
+    left: 40px; }
+  .flsTutoContainer .flsTutoPotiron {
+    left: 150px;
+    top: -15px; }
+    .flsTutoContainer .flsTutoPotiron::after {
+      animation-delay: -1.3s; }
+    .flsTutoContainer .flsTutoPotiron .flsTutoFruitLeg {
+      animation-delay: -1.3s; }
 
 @font-face {
   font-family: 'fontFamTitles';
@@ -115,19 +194,27 @@ body {
 
 .dglTutoContainer {
   width: 100vw;
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
   align-items: center;
   background-color: #2c2e35; }
-  .dglTutoContainer h1 {
-    margin-bottom: 10px;
+  .dglTutoContainer h2, .dglTutoContainer h3 {
     font-family: 'fontFamTitles';
-    font-size: 2.5rem;
-    color: white; }
+    text-align: center; }
   .dglTutoContainer .dglLaunchGameButton {
     position: static; }
+  .dglTutoContainer p {
+    font-family: 'fontFamMain'; }
+  .dglTutoContainer .dglTutoBikeImg {
+    position: absolute;
+    left: 85px;
+    top: 27px;
+    width: 100px;
+    height: 100px;
+    background: center/contain no-repeat url("../img/bike01.svg");
+    animation: animateBike .3s infinite linear; }
 
 .dglUIContainer {
   position: fixed;
@@ -201,5 +288,11 @@ body {
 @font-face {
   font-family: 'fontFamMain';
   src: url(../temp/minionpro_regular.otf); }
+@media (max-width: 812px) and (orientation: portrait) {
+  .dglTutoContainer .dglTutoBikeImg {
+    left: 26px;
+    top: 64px;
+    width: 64px;
+    height: 64px; } }
 
 /*# sourceMappingURL=dgl_style.css.map */

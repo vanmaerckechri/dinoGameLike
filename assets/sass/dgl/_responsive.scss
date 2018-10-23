@@ -4,6 +4,16 @@
 }
 @media (max-width: 812px) and (orientation: portrait)
 {
+	.dglTutoContainer
+	{
+		.dglTutoBikeImg
+		{
+			left: 26px;
+			top: 64px;
+			width: 64px;
+			height: 64px;
+		}
+	}
 }
 @media (max-width: 812px)
 {
