@@ -190,7 +190,7 @@ body {
   max-width: 100vw;
   max-height: 100vh;
   overflow: hidden;
-  background-color: #91bbc5; }
+  background: linear-gradient(to bottom, #7db9e8 0%, #91bbc5 100%); }
 
 .dglTutoContainer {
   width: 100vw;
@@ -242,7 +242,7 @@ body {
       border-radius: 8px;
       width: 100%;
       height: 100%;
-      background-color: rgba(255, 255, 255, 0.7);
+      background-color: rgba(76, 101, 122, 0.7);
       transform-origin: left;
       transform: scaleX(0.5);
       transition: all .3s; }

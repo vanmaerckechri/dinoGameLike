@@ -195,7 +195,7 @@ let DinoGameLike = class
 			{
 				img: createElem("img", "src", "assets/img/olives.svg"),
 				alt: "olives en vrac",
-				co2: 10,
+				co2: -10,
 				posX: 0,
 				posY: 0,
 				width: 33,
