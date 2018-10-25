@@ -6,7 +6,7 @@ let DinoGameLike = class
 		this.refreshGameLoop;
 		this.canvasList = [];
 		this.timeStart;
-		this.speed = 1;
+		this.speed = 3;
 
 		this.plxGoal =
 		{
@@ -529,7 +529,7 @@ let DinoGameLike = class
 		// jump intensity
 		if (this.player.jump === 2)
 		{
-			let jumpInertieMaxPosY = this.player.posY - (10 * this.player.jumpStep);
+			let jumpInertieMaxPosY = this.player.posY - (5 * this.player.jumpStep);
 			this.player.jump = 1;
 			if (jumpInertieMaxPosY > this.player.jumpMaxPosY)
 			{
@@ -709,7 +709,7 @@ let DinoGameLike = class
 		this.player.posX = (this.canvasList[0].canvas.width / 100) * 1;
 		this.player.floorPosY = this.canvasList[0].canvas.height - this.player.height - (this.canvasList[0].canvas.height / 100) * 5;
 		this.player.posY = this.player.floorPosY;
-		this.player.jumpStep = this.player.height / 100 * 10;
+		this.player.jumpStep = this.player.height / 100 * 15;
 		this.player.jumpMaxPosY = this.player.floorPosY - (this.player.height * 2.5);
 		this.player.jumpInertieMaxPosY = this.player.jumpMaxPosY;
 	}
@@ -788,7 +788,9 @@ let DinoGameLike = class
 		let dglCanvasMain = createElem("canvas", ["id", "class"], ["dglCanvasMain", "dglCanvasMain"]);
 
 		dglCanvasContainer.appendChild(dglCanvasMain);
-		dglContainer.appendChild(dglCanvasContainer);
+
+		dglContainer.insertBefore(dglCanvasContainer, dglContainer.firstChild);
+
 
 		this.initCanvas(dglCanvasMain, "dglCtxMain");
 		this.updateParallaxToCanvas(this.parallax);

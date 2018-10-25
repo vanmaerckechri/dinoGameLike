@@ -180,6 +180,9 @@ body {
   width: 100%;
   transform: translateX(-50%); }
 
+canvas {
+  -webkit-transform: translateZ(0); }
+
 @font-face {
   font-family: 'fontFamTitles';
   src: url(../temp/brauerneue.otf); }
@@ -220,6 +223,8 @@ body {
   position: fixed;
   width: 100vw;
   height: 100px;
+  top: 0;
+  left: 0;
   display: flex;
   justify-content: space-around;
   align-items: center; }
